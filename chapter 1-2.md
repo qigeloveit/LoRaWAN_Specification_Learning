@@ -30,6 +30,7 @@ LoRa是Semtech公司为远距离低功耗低速率应用开发的一种无线调
 一个LoRa网络包括基础LoRaWAN（称为Class A）和可选特性（Class B,Class C...）：
 ![lorawan classes](https://raw.githubusercontent.com/qigeloveit/LoRaWAN_Specification_Learning/master/image/lorawan_classes.png)
 <center>图1 LoRaWAN Classes</center>
+
 - **双向传输终端（Class A）**：Class A 终端在每个上行链路后会有两个短暂的下行接收窗口，以此实现双工通信。传输时隙由终端根据自身通信需求规划，并附加一点随机延时（ALOHA协议）。对于那些只需要在发送数据之后短时间内接收服务器数据的应用而言，Class A 是功耗最低的终端系统。服务器在其它时间内的下行数据要等到下一次上行链路之后才能发送。
 - **规划接收时隙的双向传输终端（Class B）**：Class B 终端允许更多接收时隙。在Class A 的随机接收窗口之上，Class B 设备会定时开启额外接收窗口。为了使终端设备能在指定时间开启接收窗口，终端设备需从网关那里获取时间同步信标Beacon。这样服务器就能知道终端设备何时处于监听状态。
 - **拥有最大接收时隙的双向传输终端（Class C）**：Class C 终端几乎一直开着接收窗口，只有当发送时才会暂时关闭。Class C 终端要比 Class A 和 Class B
@@ -40,5 +41,3 @@ LoRa是Semtech公司为远距离低功耗低速率应用开发的一种无线调
 ```
   注意：为避免重复，物理层消息格式、MAC消息格式以及其余规范中几类终端共同部分内容将只在Class A 部分进行描述。
 ```
-
-### 3 物理层消息格式
