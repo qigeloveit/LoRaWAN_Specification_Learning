@@ -17,7 +17,7 @@ LoRaWAN网络架构是一个典型的星型拓扑结构，其中网关作为透�
 所有LoRaWAN设备都必须至少实现本文档描述的Class A功能。同时本文档描述的Class B、Class C或后续定义功能则为可选功能，但无论如何，设备均需兼容Class A。
 
 #### 1.2 约定
-MAC命令的格式为***LinkCheckReq***，bits和bit域的格式为**FRMPayload**，常量格式为RECEIVE_DELAY1，变量格式为*N*。
+MAC命令的格式为**_LinkCheckReq_**，bits和bit域的格式为**FRMPayload**，常量格式为RECEIVE_DELAY1，变量格式为*N*。
 
 在本文档中，
 - 所有多字节字段采用小端字节序；
