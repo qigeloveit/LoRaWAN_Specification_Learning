@@ -131,7 +131,7 @@ MAC指令不能同时存在于payload和帧选项字段之中。
 ##### 4.3.2 端口（FPort）
 FRMPayload不为空时，必须填写端口字段。此时FPort为0表示FRMPayload仅包含MAC指令；FPort取值1-233（0x01-0xDF）视应用而定，取值224-255（0xE0-0xFF）保留作将来标准应用扩展。
 
-| Size(bytes) | 7..23 | 0..1  |    0..*N*    |
+| Size(bytes) | 7..23 | 0..1  |    0..*N*  |
 | ----------- | ----- | ----- | ---------- |
 | MACPayload  | FHDR  | FPort | FRMPayload |
 
@@ -139,6 +139,73 @@ FRMPayload不为空时，必须填写端口字段。此时FPort为0表示FRMPayl
 
 *N* 应小于等于：
 
+<center>N ≤ M−1−(FHDR字节数)
+
+其中*M*为最大MACPayload长度。</center>
+
+##### 4.3.3 MAC帧payload加密（FRMPayload）
+当数据帧中携带了负载时，**FRMPayload**须在计算消息一致码（**MIC**）之前进行加密。
+
+加密机制采用IEEE 802.15.4/2006附录B描述的AES128算法。
+
+默认情况下，所有端口的加解密是由LoRaWAN层完成。但除端口0外，若对应用更方便的话，其他端口的加解密操作也可以由LoRaWAN层之上来完成。不过这种情况下需要通过带外通道将这些节点和端口FPort告知服务器，详见第19章。
+
+###### 4.3.3.1 LoRaWAN层加密
+使用的密钥K取决于端口FPort：
+
+| FPort  |    K    |
+| ------ | ------- |
+|   0    | NwkSKey |
+| 1..255 | AppSKey |
+
+表3 FPort列表
+
+加密字段为：
+
+pld = **FRMPayload**
+
+对于每包数据，取i = 1..k，k = ceil(len(pld) / 16)，算法定义块序列A<sub>i</sub>如下：
+
+|  Size(bytes)  |  1   |    4     |  1  |    4    |         4          |  1   |  1  |
+| ------------- | ---- | -------- | --- | ------- | ------------------ | ---- | --- |
+| A<sub>i</sub> | 0x01 | 4 x 0x00 | Dir | DevAddr | FCntUp or FCntDown | 0x00 |  i  |
+
+Dir字段表示方向，0为上行帧，1为下行帧。
+
+对块序列A<sub>i</sub>加密生成S<sub>i</sub>，从而得到序列S：
+
+S<sub>i</sub> = aes128_encrypt(K, A<sub>i</sub>) for i = 1..k
+
+S = S<sub>1</sub> | S<sub>2</sub> | .. | S<sub>k</sub>
 
 
-其中*M*为最大MACPayload长度。
+通过截取
+
+（pld|pad<sub>16</sub>） xor S
+
+的前len(pld)字节，得到payload的加解密序列。
+
+###### 4.3.3.2 LoRaWAN层以上加密
+如果LoRaWAN层从特定端口（不能为端口0，这是预留用作MAC指令的）收到上层传来已预加密的FRMPayload，那么将不对数据进行处理，直接将FRMPayload在MACPlayload和应用之间进行转发。
+
+#### 4.4 消息一致码（MIC）
+消息一致码基于消息的所有字段计算得出。
+<center>
+msg = MHDR | FHDR | FPort | FRMPayload
+</center>
+
+len(msg)即表示消息总字节数。
+
+**MIC** 计算方式如下[RFC4493]：
+
+cmac = aes128_cmac(NwkSKey, B<sub>0</sub> | msg)
+
+MIC = cmac[0..3]
+
+其中B<sub>0</sub>定义如下：
+
+|  Size(bytes)  |  1   |    4     |  1  |    4    |         4          |  1   |    1     |
+| ------------- | ---- | -------- | --- | ------- | ------------------ | ---- | -------- |
+| B<sub>0</sub> | 0x49 | 4 x 0x00 | Dir | DevAddr | FCntUp or FCntDown | 0x00 | len(msg) |
+
+其中Dir字段表示方向，0为上行帧，1为下行帧。
