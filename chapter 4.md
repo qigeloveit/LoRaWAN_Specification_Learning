@@ -1,6 +1,3 @@
-<script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
-</script>
-
 ### 4 MAC层消息格式
 所有LoRa上下行消息均携带PHY负载（Payload），该负载以单字节MAC头（MHDR）开始，紧跟着MAC负载（MACPayload），然后以4字节消息完整码（MIC）结尾。
 ![mac_format](https://raw.githubusercontent.com/qigeloveit/LoRaWAN_Specification_Learning/master/image/mac_format.png)
@@ -142,8 +139,6 @@ FRMPayload不为空时，必须填写端口字段。此时FPort为0表示FRMPayl
 
 *N* 应小于等于：
 
-$$
-N\leq M-1-(FHDR所占字节数)
-$$
+
 
 其中*M*为最大MACPayload长度。
