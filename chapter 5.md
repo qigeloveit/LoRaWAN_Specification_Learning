@@ -106,7 +106,7 @@ LinkADRAns Status字段各bit位含义如下：
 
 允许的最大终端发送占空比为：
 
-$$总发送占空比 = \frac{1}{2^{MaxDCycle}}$$
+![](http://latex.codecogs.com/gif.latex?aggregatedDutyCycle%20%3D%20%5Cfrac%7B1%7D%7B2%5E%7BMaxDCycle%7D%7D)
 
 MaxDutyCycle的有效范围为[0:15]。0表示除了当地法规限制外"没有占空比限制"。
 
